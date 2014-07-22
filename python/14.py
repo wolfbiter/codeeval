@@ -50,7 +50,7 @@ def simulateTurn(deck, humanHits):
 def simulateGame(deck=None, strategy=None):
   """
   Returns total wins for each player.
-  Given optional strategy, which is an iterator of booleans representing player decisions.
+  Given optional strategy, which is an iterator of booleans representing player decisions for each turn.
   Generates random 40 card deck if no deck is given.
   Generates random strategy if no strategy is given.
   """
