@@ -67,11 +67,11 @@ def simulateGame(deck=None, strategy=None):
   while len(deck) >= 4:
     try:
       winner, deck = simulateTurn(deck, next(strategy))
+      if winner >= 0:
+        # tally turn wins
+        wins[winner] += 1
     except StopIteration:
       raise Exception("Strategy did not last for a complete game.")
-    if winner >= 0:
-      # tally turn wins
-      wins[winner] += 1
 
   # return array of wins => wins[0] is human, wins[1] is AI
   return wins
