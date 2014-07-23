@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# find where script is located
+DIR=$(cd $(dirname "$0"); pwd)
+
+# compile and run c program with corresponding .txt input file
+gcc $1.c -std=c99 -o problem
+./problem $1.txt

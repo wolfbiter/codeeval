@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 #define LINE_SIZE 1024
 int main(int argc, char **argv) {
@@ -24,43 +25,41 @@ int main(int argc, char **argv) {
     /*********************/
     /*** DO LINE ***/
     /*********************/
+    char *delim = ",";
 
-    // get numbers
-    double numbers[LINE_SIZE];
-    char *token = strtok(line, " ");
-    int length = 0;
+    // split line at semicolon
+    int size = atoi(strtok(line, ";"));
+    char *elements = strtok(NULL, ";");
+
+    // parse integers into array
+    int arr[size];
+    char *token = strtok(elements, delim);
+    int i = 0;
     while (token != NULL) {
-      numbers[length++] = atof(token);
-      token = strtok(NULL, " ");
+      arr[i++] = atoi(token);
+      token = strtok(NULL, delim);
     }
 
-    double min(double a, double b) {
-      if (a < b) { return a; }
-      else { return b; }
+    // initialize seen
+    bool encountered[size];
+    for (i = 0; i < size; i++) {
+      encountered[i] = false;
     }
 
-    // selection sort
-    int i, j;
-    for (i = 0; i < length; i++) {
-      double curr_min[] = {999999.0, -1.0};
-      for (j = i; j < length; j++) {
-        double num = numbers[j];
-        if (num < curr_min[0]) {
-          curr_min[0] = num;
-          curr_min[1] = j;
-        }
+    // find duplicate
+    int curr = -1;
+    for (i = 0; i < size; i++) {
+      curr = arr[i];
+      if (encountered[curr]) {
+        break;
+      } else {
+        encountered[curr] = true;
       }
-      // swap
-      numbers[(int) curr_min[1]] = numbers[i];
-      numbers[i] = curr_min[0];
     }
 
-    // print sorted numbers
-    for (i = 0; i < length; i++) {
-      printf("%.3f ", numbers[i]);
-    }
-    printf("\n");
-    
+    // print duplicate
+    printf("%d\n", curr);
+
     /**************************/
     /*** /END DO LINE ***/
     /**************************/
