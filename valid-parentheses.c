@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define LINE_SIZE 1024
 
@@ -8,7 +10,65 @@ struct stack {
   int curr;
 };
 
-typdef struct stack stack_struct;
+typedef struct stack stack_struct;
+
+bool open(char a) {
+  if (a == '(' || a == '[' || a == '{') {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+bool close(char a) {
+  if (a == ')' || a == ']' || a == '}') {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+bool match(char a, char b) {
+  //printf("CHECKING MATCH %c %c\n", a, b);
+  if (a == '(' && b == ')') {
+    return true;
+  }
+  if (a == '[' && b == ']') {
+    return true;
+  }
+  if (a == '{' && b == '}') {
+    return true;
+  }
+  return false;
+}
+
+stack_struct* make_stack() {
+  stack_struct* result = malloc(sizeof(*result));
+  result->curr = -1;
+  return result;
+}
+
+void push(stack_struct* s, char c) {
+  int curr = s->curr;
+  //printf("PUSHING %d %c\n", curr, c);
+  if (curr == -1) {
+    curr = 0;
+  }
+  s->symbols[curr] = c;
+  s->curr = ++curr;
+}
+
+char pop(stack_struct* s) {
+  if (s->curr == -1) {
+    return 'X';
+  } else {
+    char result = s->symbols[--(s->curr)];
+    //printf("POPPING %d %c\n", s->curr, result);
+    return result;
+  }
+}
 
 int main(int argc, char **argv) {
   FILE *f;
@@ -33,26 +93,34 @@ int main(int argc, char **argv) {
     /*********************/
 
     // keep stack of encountered symbols
-    stack_struct symbols;
-    symbols = make_stack();
+    stack_struct* symbols = make_stack();
 
-    int i; bool b;
+    int i; bool b = true;
     for (i = 0; i < strlen(line); i++) {
       char symbol = line[i];
-      switch (symbol) {
+      //printf("SYMBOL %c\n", symbol);
+      if (open(symbol)) {
         // if open, push onto stack
-        case "(": case "[": case "{":
-          symbols.push(symbol); break;
-        // if close, make sure it's valid
-        case ")": case "]": case "}":
-          b = (b and match(symbols.pop(), symbol));
-          break;
-
-        default:
-          printf("ERROR, unknown symbol.\n");
-          return 1;
+        push(symbols, symbol);
       }
+      else if (close(symbol)) {
+        // if close, make sure it's valid
+        b = (b && match(pop(symbols), symbol));
+        // if invalid, exit loop
+        if (!b) {
+          break;
+        }
+      }
+      else {
+        printf("ERROR, unknown symbol.\n");
+        return 1;
+      }
+    }
 
+    if (b && (symbols->curr == 0)) {
+      printf("True\n");
+    } else {
+      printf("False\n");
     }
 
     /**************************/
@@ -69,36 +137,3 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-bool match(char a, char b) {
-  if (*a == "(" and *b == ")") {
-    return true;
-  }
-  if (*a == "[" and *b == "]") {
-    return true;
-  }
-  if (*a == "{" and *b == "}") {
-    return true;
-  }
-}
-
-stack_struct make_stack() {
-  stack_struct result;
-  result.curr = -1;
-  return result;
-}
-
-void push(stack s, char c) {
-  int curr = s->curr;
-  s->symbols[curr] = c;
-  s.curr++;
-}
-
-char pop(stack s) {
-  int curr = s->curr;
-  if (curr == -1) {
-    return NULL;
-  } else {
-    char result = s->symbols[curr--];
-    s.curr--;
-  }
-}
